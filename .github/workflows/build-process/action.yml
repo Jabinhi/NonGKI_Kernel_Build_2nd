@@ -34,6 +34,9 @@ runs:
         shell: bash
         run: |
           cd $GITHUB_WORKSPACE/device_kernel/
+          export LOCALVERSION="-g$(git rev-parse --short=12 HEAD)"
+          export KBUILD_BUILD_USER=build-user
+          export KBUILD_BUILD_HOST=build-host
 
           # Function
           BUILD_PROCESS(){
@@ -81,7 +84,7 @@ runs:
             fi
           fi
 
-          if [[ "${{ env.DROIDSPACES_ENABLE }}"  == "true" ]]; then
+          if [[ "${{ env.BUILD_OTHER_CONFIG }}"  == "true" ]] && [[ "${{ env.DROIDSPACES_ENABLE }}" == "true" ]]; then
             echo "================="
             echo "=  Droidspaces  ="
             echo "================="
