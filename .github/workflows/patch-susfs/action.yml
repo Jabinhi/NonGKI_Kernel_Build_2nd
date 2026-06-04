@@ -144,6 +144,24 @@ runs:
 
           fi
 
+          if [[ "${{ env.BUILD_DEBUGGER }}" == "true" ]]; then
+            if find . -type f -name "*.rej" | grep -q .; then
+              echo "[+] Found .rej files from SUSFS Patch Fixed, packing for upload..."
+              temp_dir=$(mktemp -d)
+              find . -name "*.rej" -exec cp --parents {} "$temp_dir" \;
+              find . -name "*.rej" | sed 's/\.rej$//' | while IFS= read -r original; do
+                if [ -f "$original" ]; then
+                  cp --parents "$original" "$temp_dir"
+                fi
+              done
+              tar -czf "rej_files_fixed.tar.gz" -C "$temp_dir" .
+              rm -rf "$temp_dir"
+              echo "[+] Packed rej_files_fixed.tar.gz"
+            else
+              echo "[+] No .rej files found from SUSFS Patch Fixed."
+            fi
+          fi
+
       - name: Upload Build Patch Rejected Files
         if: env.BUILD_DEBUGGER == 'true'
         uses: actions/upload-artifact@v4
